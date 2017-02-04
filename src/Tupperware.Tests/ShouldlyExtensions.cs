@@ -15,10 +15,5 @@ namespace Tupperware.Tests
         {
             actual.ShouldBeOfType(typeof(T));
         }
-
-        public static void ShouldImplement<TInterface>(this object actual)
-        {
-            typeof(TInterface).IsAssignableFrom(actual.GetType());
-        }
     }
 }

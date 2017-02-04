@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using Tupperware.InstanceResolvers;
 
 namespace Tupperware
@@ -27,16 +28,30 @@ namespace Tupperware
 
         public TRegisteredType Resolve<TRegisteredType>()
         {
-            var registration = _registrations[typeof(TRegisteredType)];
-            var arguments = new object[] {};
-            return registration.Resolve(_constructorProvider, arguments).As<TRegisteredType>();
+            return Resolve(typeof(TRegisteredType)).As<TRegisteredType>();
         }
-        
+
+        private object Resolve(Type resolutionType)
+        {
+            Registration registration;
+            if (!_registrations.TryGetValue(resolutionType, out registration))
+            {
+                throw new MissingRegistrationException(resolutionType);
+            }
+            var constructor = _constructorProvider.GetConstructor(registration.ImplementationType);
+            var arguments = constructor
+                .GetParameters()
+                .Select(param => Resolve(param.ParameterType))
+                .ToArray();
+
+            return registration.Resolve(_constructorProvider, arguments);
+        }
     }
 
     public class Registration
     {
-        public Func<IConstructorProvider, object[], object> Resolver { get; set; }
+        public Func<IConstructorProvider, object[], object> Resolver { get; private set; }
+        public Type ImplementationType { get; private set; }
 
         public static Registration For<T>(Lifecycle lifecycle = Lifecycle.Transient)
         {
@@ -54,6 +69,7 @@ namespace Tupperware
 
             return new Registration
             {
+                ImplementationType = typeof(T),
                 Resolver = resolver
             };
         }
