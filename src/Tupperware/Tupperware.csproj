@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ConstructorProviders.cs" />
+    <Compile Include="Container.cs" />
     <Compile Include="InstanceResolvers\IInstanceResolver.cs" />
     <Compile Include="ObjectBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

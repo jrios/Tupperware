@@ -10,5 +10,15 @@ namespace Tupperware.Tests
         {
             collection.Count().ShouldBe(count);
         }
+
+        public static void ShouldBeOfType<T>(this object actual)
+        {
+            actual.ShouldBeOfType(typeof(T));
+        }
+
+        public static void ShouldImplement<TInterface>(this object actual)
+        {
+            typeof(TInterface).IsAssignableFrom(actual.GetType());
+        }
     }
 }

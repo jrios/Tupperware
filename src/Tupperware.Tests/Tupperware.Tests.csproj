@@ -40,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContainerTests.cs" />
     <Compile Include="InstanceResolvers\ComplexObject.cs" />
     <Compile Include="ConstructorProviderTests.cs" />
     <Compile Include="InstanceResolvers\Name.cs" />
