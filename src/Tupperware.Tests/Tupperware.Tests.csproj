@@ -40,10 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InstanceResolvers\ComplexObject.cs" />
     <Compile Include="ConstructorProviderTests.cs" />
+    <Compile Include="InstanceResolvers\Name.cs" />
     <Compile Include="ObjectBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ShouldlyExtensions.cs" />
+    <Compile Include="InstanceResolvers\SingletonInstanceResolverTests.cs" />
+    <Compile Include="InstanceResolvers\TransientInstanceResolverTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Tupperware\Tupperware.csproj">
