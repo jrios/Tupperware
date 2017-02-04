@@ -1,0 +1,8 @@
+packages/
+.paket/paket.exe
+bin/
+obj/
+.suo
+**/*/.suo
+.vs
+**/*/.vs
