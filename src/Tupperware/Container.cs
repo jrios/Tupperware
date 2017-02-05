@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Reflection;
 
 namespace Tupperware
 {
@@ -8,6 +9,7 @@ namespace Tupperware
     {
         private readonly IConstructorProvider _constructorProvider;
         private readonly ConcurrentDictionary<Type, IRegistration> _registrations;
+        private readonly ConcurrentDictionary<Type, ConstructorInfo> _knownConstructors;
 
         public Container() : this(new GreedyConstructorProvider())
         {
@@ -15,8 +17,9 @@ namespace Tupperware
 
         public Container(IConstructorProvider constructorProvider)
         {
-            _registrations = new ConcurrentDictionary<Type, IRegistration>();
             _constructorProvider = constructorProvider;
+            _registrations = new ConcurrentDictionary<Type, IRegistration>();
+            _knownConstructors = new ConcurrentDictionary<Type, ConstructorInfo>();
         }
 
         public void Register<TRegisteredType, TImplementation>(Lifecycle lifecycle = Lifecycle.Transient)
@@ -36,7 +39,9 @@ namespace Tupperware
             {
                 throw new MissingRegistrationException(resolutionType);
             }
-            var constructor = _constructorProvider.GetConstructor(registration.ImplementationType);
+
+            var constructor = _knownConstructors.GetOrAdd(registration.ImplementationType,
+                type => _constructorProvider.GetConstructor(type));
             var arguments = constructor
                 .GetParameters()
                 .Select(param => Resolve(param.ParameterType))
