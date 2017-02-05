@@ -1,29 +1,27 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Linq;
-using Tupperware.InstanceResolvers;
 
 namespace Tupperware
 {
     public class Container
     {
         private readonly IConstructorProvider _constructorProvider;
-        private readonly ConcurrentDictionary<Type, Registration> _registrations;
+        private readonly ConcurrentDictionary<Type, IRegistration> _registrations;
 
-        public Container()
-            : this(new GreedyConstructorProvider())
+        public Container() : this(new GreedyConstructorProvider())
         {
         }
 
         public Container(IConstructorProvider constructorProvider)
         {
-            _registrations = new ConcurrentDictionary<Type, Registration>();
+            _registrations = new ConcurrentDictionary<Type, IRegistration>();
             _constructorProvider = constructorProvider;
         }
 
-        public void Register<TRegisteredType, TImplementation>()
+        public void Register<TRegisteredType, TImplementation>(Lifecycle lifecycle = Lifecycle.Transient)
         {
-            _registrations.TryAdd(typeof(TRegisteredType), Registration.For<TImplementation>());
+            _registrations.TryAdd(typeof(TRegisteredType), new Registration<TImplementation>(lifecycle));
         }
 
         public TRegisteredType Resolve<TRegisteredType>()
@@ -33,7 +31,7 @@ namespace Tupperware
 
         private object Resolve(Type resolutionType)
         {
-            Registration registration;
+            IRegistration registration;
             if (!_registrations.TryGetValue(resolutionType, out registration))
             {
                 throw new MissingRegistrationException(resolutionType);
@@ -44,58 +42,7 @@ namespace Tupperware
                 .Select(param => Resolve(param.ParameterType))
                 .ToArray();
 
-            return registration.Resolve(_constructorProvider, arguments);
-        }
-    }
-
-    public class Registration
-    {
-        public Func<IConstructorProvider, object[], object> Resolver { get; private set; }
-        public Type ImplementationType { get; private set; }
-
-        public static Registration For<T>(Lifecycle lifecycle = Lifecycle.Transient)
-        {
-            Func<IConstructorProvider, object[], object> resolver = null;
-
-            switch (lifecycle)
-            {
-                case Lifecycle.Transient:
-                    resolver = resolveTransient<T>();
-                    break;
-                case Lifecycle.Singleton:
-                    resolver = resolveSingleton<T>();
-                    break;
-            }
-
-            return new Registration
-            {
-                ImplementationType = typeof(T),
-                Resolver = resolver
-            };
-        }
-
-        private static Func<IConstructorProvider, object[], object> resolveSingleton<T>()
-        {
-            return (constructorProvider, arguments) =>
-            {
-                var constructor = constructorProvider.GetConstructor(typeof(T));
-                var resolver = new SingletonInstanceResolver<T>(constructor, arguments);
-                return resolver.Resolve(constructor, arguments);
-            };
-        }
-
-        private static Func<IConstructorProvider, object[], object> resolveTransient<T>()
-        {
-            return (constructorProvider, arguments) =>
-            {
-                var resolver = new TransientInstanceResolver<T>();
-                return resolver.Resolve(constructorProvider.GetConstructor(typeof(T)), arguments);
-            };
-        }
-
-        public object Resolve(IConstructorProvider constructorProvider, object[] arguments)
-        {
-            return Resolver(constructorProvider, arguments);
+            return registration.Resolve(constructor, arguments);
         }
     }
 

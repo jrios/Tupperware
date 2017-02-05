@@ -43,6 +43,37 @@ namespace Tupperware.Tests
             var container = new Container();
             Should.Throw<MissingRegistrationException>(() => container.Resolve<IBar>());
         }
+
+        [Fact]
+        public void container_can_register_type_with_singleton_lifecycle()
+        {
+            var container = new Container();
+            container.Register<IBar, Bar>(Lifecycle.Singleton);
+        }
+
+        [Fact]
+        public void container_resolves_transients_with_different_instances_each_time()
+        {
+            var container = new Container();
+            container.Register<IBar, Bar>();
+
+            var bar1 = container.Resolve<IBar>();
+            var bar2 = container.Resolve<IBar>();
+
+            bar2.ShouldNotBeSameAs(bar1);
+        }
+
+        [Fact]
+        public void container_resolves_singletons_with_same_instances_each_time()
+        {
+            var container = new Container();
+            container.Register<IBar, Bar>(Lifecycle.Singleton);
+
+            var bar1 = container.Resolve<IBar>();
+            var bar2 = container.Resolve<IBar>();
+
+            bar2.ShouldBeSameAs(bar1);
+        }
     }
 
     public interface IBar { }
