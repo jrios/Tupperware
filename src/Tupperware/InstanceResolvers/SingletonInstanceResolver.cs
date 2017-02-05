@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Tupperware.InstanceResolvers
 {
@@ -6,32 +7,16 @@ namespace Tupperware.InstanceResolvers
     {
         private readonly Lazy<T> _instance;
 
-        public SingletonInstanceResolver()
-            : this(new GreedyConstructorProvider())
+        public SingletonInstanceResolver(ConstructorInfo constructorInfo, object[] arguments)
         {
+            _instance = new Lazy<T>(() =>
+            {
+                var objectBuilder = new ObjectBuilder<T>(constructorInfo);
+                return objectBuilder.BuildObjectInstance(arguments);
+            });
         }
 
-        public SingletonInstanceResolver(object[] arguments)
-            : this(new GreedyConstructorProvider(), arguments)
-        {
-
-        }
-
-        public SingletonInstanceResolver(IConstructorProvider constructorProvider)
-        {
-            var ctor = constructorProvider.GetConstructor(typeof(T));
-            var objectBuilder = new ObjectBuilder<T>(ctor);
-            _instance = new Lazy<T>(() => objectBuilder.BuildObjectInstance(), isThreadSafe: true);
-        }
-
-        public SingletonInstanceResolver(IConstructorProvider constructorProvider, object[] arguments)
-        {
-            var ctor = constructorProvider.GetConstructor(typeof(T));
-            var objectBuilder = new ObjectBuilder<T>(ctor);
-            _instance = new Lazy<T>(() => objectBuilder.BuildObjectInstance(arguments), isThreadSafe: true);
-        }
-
-        public T Resolve()
+        public T Resolve(ConstructorInfo constructor, object[] arguments)
         {
             return _instance.Value;
         }

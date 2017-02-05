@@ -78,8 +78,9 @@ namespace Tupperware
         {
             return (constructorProvider, arguments) =>
             {
-                var resolver = new SingletonInstanceResolver<T>(constructorProvider, arguments);
-                return resolver.Resolve();
+                var constructor = constructorProvider.GetConstructor(typeof(T));
+                var resolver = new SingletonInstanceResolver<T>(constructor, arguments);
+                return resolver.Resolve(constructor, arguments);
             };
         }
 
@@ -87,8 +88,8 @@ namespace Tupperware
         {
             return (constructorProvider, arguments) =>
             {
-                var resolver = new TransientInstanceResolver<T>(constructorProvider, arguments);
-                return resolver.Resolve();
+                var resolver = new TransientInstanceResolver<T>();
+                return resolver.Resolve(constructorProvider.GetConstructor(typeof(T)), arguments);
             };
         }
 

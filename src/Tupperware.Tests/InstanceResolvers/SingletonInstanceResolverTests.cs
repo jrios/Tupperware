@@ -1,4 +1,5 @@
-﻿using Shouldly;
+﻿using System.Reflection;
+using Shouldly;
 using Tupperware.InstanceResolvers;
 using Xunit;
 
@@ -6,12 +7,24 @@ namespace Tupperware.Tests.InstanceResolvers
 {
     public class SingletonInstanceResolverTests
     {
+        private readonly ConstructorInfo _nameConstructor;
+        private readonly ConstructorInfo _complexObjectConstructor;
+
+
+        public SingletonInstanceResolverTests()
+        {
+            _nameConstructor = typeof(Name).GetConstructors()[0];
+            _complexObjectConstructor = typeof(ComplexObject).GetConstructors()[0];
+        }
+
         [Fact]
         public void resolving_a_singleton_returns_same_object()
         {
-            var singletonResolver = new SingletonInstanceResolver<Name>();
-            var instance1 = singletonResolver.Resolve();
-            var instance2 = singletonResolver.Resolve();
+            var emptyArgs = new object[] { };
+
+            var singletonResolver = new SingletonInstanceResolver<Name>(_nameConstructor, emptyArgs);
+            var instance1 = singletonResolver.Resolve(_nameConstructor, emptyArgs);
+            var instance2 = singletonResolver.Resolve(_nameConstructor, emptyArgs);
 
             instance2.ShouldBeSameAs(instance1);
         }
@@ -21,10 +34,10 @@ namespace Tupperware.Tests.InstanceResolvers
         {
             var foo = new Foo();
             var args = new object[] {foo};
-            var singletonResolver = new SingletonInstanceResolver<ComplexObject>(args);
+            var singletonResolver = new SingletonInstanceResolver<ComplexObject>(_complexObjectConstructor, args);
 
-            var instance1 = singletonResolver.Resolve();
-            var instance2 = singletonResolver.Resolve();
+            var instance1 = singletonResolver.Resolve(_complexObjectConstructor, args);
+            var instance2 = singletonResolver.Resolve(_complexObjectConstructor, args);
 
             instance2.ShouldBeSameAs(instance1);
         }
