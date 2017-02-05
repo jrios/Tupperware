@@ -19,14 +19,16 @@ namespace Tupperware.InstanceResolvers
 
         public SingletonInstanceResolver(IConstructorProvider constructorProvider)
         {
-            var objectBuilder = new ObjectBuilder<T>(constructorProvider);
-            _instance = new Lazy<T>(() => objectBuilder.CreateInstance(), isThreadSafe: true);
+            var ctor = constructorProvider.GetConstructor(typeof(T));
+            var objectBuilder = new ObjectBuilder<T>(ctor);
+            _instance = new Lazy<T>(() => objectBuilder.BuildObjectInstance(), isThreadSafe: true);
         }
 
         public SingletonInstanceResolver(IConstructorProvider constructorProvider, object[] arguments)
         {
-            var objectBuilder = new ObjectBuilder<T>(constructorProvider);
-            _instance = new Lazy<T>(() => objectBuilder.CreateInstance(arguments), isThreadSafe: true);
+            var ctor = constructorProvider.GetConstructor(typeof(T));
+            var objectBuilder = new ObjectBuilder<T>(ctor);
+            _instance = new Lazy<T>(() => objectBuilder.BuildObjectInstance(arguments), isThreadSafe: true);
         }
 
         public T Resolve()

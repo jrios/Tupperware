@@ -13,8 +13,9 @@ namespace Tupperware.InstanceResolvers
 
         public TransientInstanceResolver(IConstructorProvider constructorProvider)
         {
-            var objectBuilder = new ObjectBuilder<T>(constructorProvider);
-            _resolveInstance = () => objectBuilder.CreateInstance();
+            var ctor = constructorProvider.GetConstructor(typeof(T));
+            var objectBuilder = new ObjectBuilder<T>(ctor);
+            _resolveInstance = () => objectBuilder.BuildObjectInstance();
         }
 
         public TransientInstanceResolver(object[] arguments)
@@ -24,8 +25,9 @@ namespace Tupperware.InstanceResolvers
 
         public TransientInstanceResolver(IConstructorProvider constructorProvider, object[] arguments)
         {
-            var objectBuilder = new ObjectBuilder<T>(constructorProvider);
-            _resolveInstance = () => objectBuilder.CreateInstance(arguments);
+            var ctor = constructorProvider.GetConstructor(typeof(T));
+            var objectBuilder = new ObjectBuilder<T>(ctor);
+            _resolveInstance = () => objectBuilder.BuildObjectInstance(arguments);
         }
 
         public T Resolve()

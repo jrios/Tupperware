@@ -42,8 +42,9 @@
   <ItemGroup>
     <Compile Include="ConstructorProviders.cs" />
     <Compile Include="Container.cs" />
+    <Compile Include="ExceptionTypes\UnresolvedParametersException.cs" />
     <Compile Include="InstanceResolvers\IInstanceResolver.cs" />
-    <Compile Include="MissingRegistrationException.cs" />
+    <Compile Include="ExceptionTypes\MissingRegistrationException.cs" />
     <Compile Include="ObjectBuilder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="InstanceResolvers\SingletonInstanceResolver.cs" />
