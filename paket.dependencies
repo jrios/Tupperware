@@ -1,4 +1,4 @@
 source https://www.nuget.org/api/v2
+nuget Microsoft.AspNet.Mvc
 nuget Shouldly
-nuget System.Collections.Immutable
 nuget xunit

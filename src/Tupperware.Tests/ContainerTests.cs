@@ -64,6 +64,17 @@ namespace Tupperware.Tests
         }
 
         [Fact]
+        public void container_can_resolve_with_nongeneric_resolve_method()
+        {
+            var container = new Container();
+            container.Register<IBar, Bar>();
+
+            var bar = container.Resolve(typeof(IBar));
+
+            bar.ShouldNotBeNull();
+        }
+
+        [Fact]
         public void container_resolves_singletons_with_same_instances_each_time()
         {
             var container = new Container();
@@ -73,6 +84,16 @@ namespace Tupperware.Tests
             var bar2 = container.Resolve<IBar>();
 
             bar2.ShouldBeSameAs(bar1);
+        }
+
+        [Fact]
+        public void can_register_a_concrete_type()
+        {
+            var container = new Container();
+            container.Register<Bar>();
+
+            var bar = container.Resolve<Bar>();
+            bar.ShouldNotBeNull();
         }
     }
 

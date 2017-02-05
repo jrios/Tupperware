@@ -5,7 +5,14 @@ using System.Reflection;
 
 namespace Tupperware
 {
-    public class Container
+    public interface IContainer
+    {
+        void Register<TRegisteredType>(Lifecycle lifecycle = Lifecycle.Transient);
+        void Register<TRegisteredType, TImplementation>(Lifecycle lifecycle = Lifecycle.Transient);
+        TRegisteredType Resolve<TRegisteredType>();
+        object Resolve(Type resolutionType);
+    }
+    public class Container : IContainer
     {
         private readonly IConstructorProvider _constructorProvider;
         private readonly ConcurrentDictionary<Type, IRegistration> _registrations;
@@ -22,6 +29,11 @@ namespace Tupperware
             _knownConstructors = new ConcurrentDictionary<Type, ConstructorInfo>();
         }
 
+        public void Register<TRegisteredType>(Lifecycle lifecycle = Lifecycle.Transient)
+        {
+            Register<TRegisteredType, TRegisteredType>(lifecycle);
+        }
+
         public void Register<TRegisteredType, TImplementation>(Lifecycle lifecycle = Lifecycle.Transient)
         {
             _registrations.TryAdd(typeof(TRegisteredType), new Registration<TImplementation>(lifecycle));
@@ -32,7 +44,7 @@ namespace Tupperware
             return Resolve(typeof(TRegisteredType)).As<TRegisteredType>();
         }
 
-        private object Resolve(Type resolutionType)
+        public object Resolve(Type resolutionType)
         {
             IRegistration registration;
             if (!_registrations.TryGetValue(resolutionType, out registration))
