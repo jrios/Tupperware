@@ -40,9 +40,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConstructorProviders.cs" />
+    <Compile Include="GreedyConstructorProvider.cs" />
     <Compile Include="Container.cs" />
     <Compile Include="ExceptionTypes\UnresolvedParametersException.cs" />
+    <Compile Include="IConstructorProvider.cs" />
     <Compile Include="InstanceResolvers\IInstanceResolver.cs" />
     <Compile Include="ExceptionTypes\MissingRegistrationException.cs" />
     <Compile Include="ObjectBuilder.cs" />

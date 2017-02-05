@@ -41,8 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ContainerTests.cs" />
+    <Compile Include="GreedyConstructorProviderTests.cs" />
     <Compile Include="InstanceResolvers\ComplexObject.cs" />
-    <Compile Include="ConstructorProviderTests.cs" />
     <Compile Include="InstanceResolvers\Name.cs" />
     <Compile Include="ObjectBuilderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

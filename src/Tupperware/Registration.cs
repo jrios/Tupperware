@@ -13,7 +13,7 @@ namespace Tupperware
     internal class Registration<T> : IRegistration
     {
         private Lazy<IInstanceResolver<T>> _instanceResolver;
-        private Lifecycle _lifecycle;
+        private readonly Lifecycle _lifecycle;
         public Type ImplementationType => typeof(T);
 
         public Registration(Lifecycle lifecycle)
@@ -24,9 +24,11 @@ namespace Tupperware
 
         public object Resolve(ConstructorInfo constructor, object[] arguments)
         {
+            Func<object> resolve = () => _instanceResolver.Value.Resolve(constructor, arguments);
+
             if (_instanceResolver.IsValueCreated)
             {
-                return resolve(_instanceResolver.Value, constructor, arguments);
+                return resolve();
             }
 
             _instanceResolver = new Lazy<IInstanceResolver<T>>(() =>
@@ -43,15 +45,9 @@ namespace Tupperware
                 }
 
                 return resolver;
-            });
+            }, isThreadSafe: true);
 
-            return resolve(_instanceResolver.Value, constructor, arguments);
+            return resolve();
         }
-
-        private object resolve(IInstanceResolver<T> resolver, ConstructorInfo constructor, object[] arguments)
-        {
-            return resolver.Resolve(constructor, arguments);
-        }
-
     }
 }
